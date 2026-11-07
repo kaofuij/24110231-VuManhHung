@@ -4,7 +4,7 @@
 ## 1. Thông tin sinh viên
 - **Họ và tên**: Vũ Mạnh Hùng
 - **Mã sinh viên**: 24110231
-- **Lớp**: Lập trình nâng cao 
+- **Lớp**: Lập trình nâng cao C#
 
 ---
 
@@ -37,3 +37,19 @@ Bài làm được xây dựng bằng **C# WinForms (.NET Framework 4.8)** kết
 ```
 
 ---
+
+## 4. Hướng dẫn chạy chương trình
+1. Mở file **`QuanLySanPham.sln`** bằng Visual Studio.
+2. Kiểm tra chuỗi kết nối trong file `App.config` (ở project `QuanLySanPham.GUI`):
+   ```xml
+   <connectionStrings>
+     <add name="QuanLySanPhamConnection" 
+          connectionString="Data Source=.\SQLEXPRESS;Initial Catalog=QuanLySanPhamDB;Integrated Security=True;MultipleActiveResultSets=True;App=EntityFramework" 
+          providerName="System.Data.SqlClient" />
+   </connectionStrings>
+   ```
+   *(Mặc định kết nối tới `.\SQLEXPRESS`. Nếu máy dùng LocalDB thì đổi thành `(localdb)\mssqllocaldb`)*
+3. Nhấn **F5** (hoặc nút **Start**):
+   - Chương trình tự động tạo CSDL `QuanLySanPhamDB` trên SQL Server.
+   - Tự động nạp sẵn 3 loại sản phẩm và 5 sản phẩm mẫu theo đúng đề bài.
+   - Giao diện form hiển thị và sẵn sàng sử dụng.
