@@ -8,19 +8,18 @@ namespace QuanLySanPham.DAL
     {
         public List<LoaiSanPham> GetAll()
         {
-            using (var context = new QuanLySanPhamDbContext())
+            using (var db = new QuanLySanPhamDbContext())
             {
-                // Đảm bảo dữ liệu mẫu đã được nạp nếu cơ sở dữ liệu mới khởi tạo
-                QuanLySanPhamDatabaseInitializer.SeedData(context);
-                return context.LoaiSanPhams.OrderBy(l => l.MaLoai).ToList();
+                QuanLySanPhamDatabaseInitializer.SeedData(db);
+                return db.LoaiSanPhams.ToList();
             }
         }
 
         public LoaiSanPham GetById(string maLoai)
         {
-            using (var context = new QuanLySanPhamDbContext())
+            using (var db = new QuanLySanPhamDbContext())
             {
-                return context.LoaiSanPhams.Find(maLoai);
+                return db.LoaiSanPhams.Find(maLoai);
             }
         }
     }

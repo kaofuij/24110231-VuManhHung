@@ -7,139 +7,105 @@ namespace QuanLySanPham.BUS
 {
     public class SanPhamBUS
     {
-        private readonly SanPhamDAL _sanPhamDAL = new SanPhamDAL();
+        private SanPhamDAL dal = new SanPhamDAL();
 
-        public List<SanPham> GetAllSanPham()
+        public List<SanPham> GetAll()
         {
-            return _sanPhamDAL.GetAll();
+            return dal.GetAll();
         }
 
-        public SanPham GetSanPhamById(string maSP)
+        public void Add(SanPham sp)
         {
-            if (string.IsNullOrWhiteSpace(maSP))
-                return null;
+            Validate(sp);
 
-            return _sanPhamDAL.GetById(maSP.Trim());
+            sp.MaSP = sp.MaSP.Trim();
+            sp.TenSP = sp.TenSP.Trim();
+
+            // kiem tra trung ma
+            if (dal.CheckExists(sp.MaSP))
+            {
+                throw new Exception("Mã sản phẩm đã tồn tại!");
+            }
+
+            dal.Add(sp);
         }
 
-        /// <summary>
-        /// Thêm mới sản phẩm có kiểm tra nghiệp vụ và kiểm tra trùng mã (Câu 4c)
-        /// </summary>
-        public void AddSanPham(SanPham sanPham)
+        public void Update(SanPham sp)
         {
-            // 1. Kiểm tra tính hợp lệ nghiệp vụ
-            ValidateSanPham(sanPham);
+            Validate(sp);
 
-            sanPham.MaSP = sanPham.MaSP.Trim();
-            sanPham.TenSP = sanPham.TenSP.Trim();
+            sp.MaSP = sp.MaSP.Trim();
+            sp.TenSP = sp.TenSP.Trim();
 
-            // 2. Kiểm tra trùng mã sản phẩm sau khi đã loại bỏ khoảng trắng đầu/cuối
-            if (_sanPhamDAL.CheckExists(sanPham.MaSP))
+            if (!dal.CheckExists(sp.MaSP))
             {
-                throw new InvalidOperationException(string.Format("Mã sản phẩm '{0}' đã tồn tại trong hệ thống. Vui lòng chọn mã khác!", sanPham.MaSP));
+                throw new Exception("Không tìm thấy sản phẩm để sửa!");
             }
 
-            _sanPhamDAL.Add(sanPham);
+            dal.Update(sp);
         }
 
-        /// <summary>
-        /// Cập nhật thông tin sản phẩm (giữ nguyên khóa chính theo Câu 4c)
-        /// </summary>
-        public void UpdateSanPham(SanPham sanPham)
+        public void Delete(string ma)
         {
-            // 1. Kiểm tra nghiệp vụ
-            ValidateSanPham(sanPham);
-
-            sanPham.MaSP = sanPham.MaSP.Trim();
-            sanPham.TenSP = sanPham.TenSP.Trim();
-
-            // 2. Kiểm tra sản phẩm có tồn tại để sửa không
-            if (!_sanPhamDAL.CheckExists(sanPham.MaSP))
+            if (string.IsNullOrWhiteSpace(ma))
             {
-                throw new InvalidOperationException(string.Format("Không tìm thấy sản phẩm có mã '{0}' để cập nhật!", sanPham.MaSP));
+                throw new Exception("Vui lòng chọn sản phẩm cần xóa!");
             }
 
-            _sanPhamDAL.Update(sanPham);
+            ma = ma.Trim();
+            if (!dal.CheckExists(ma))
+            {
+                throw new Exception("Sản phẩm không tồn tại hoặc đã bị xóa!");
+            }
+
+            dal.Delete(ma);
         }
 
-        /// <summary>
-        /// Xóa sản phẩm theo mã sản phẩm
-        /// </summary>
-        public void DeleteSanPham(string maSP)
+        private void Validate(SanPham sp)
         {
-            if (string.IsNullOrWhiteSpace(maSP))
+            if (sp == null)
             {
-                throw new ArgumentException("Mã sản phẩm không được để trống khi thực hiện xóa.");
+                throw new Exception("Dữ liệu không hợp lệ!");
             }
 
-            string cleanMaSP = maSP.Trim();
-            if (!_sanPhamDAL.CheckExists(cleanMaSP))
+            if (string.IsNullOrWhiteSpace(sp.MaSP))
             {
-                throw new InvalidOperationException(string.Format("Sản phẩm có mã '{0}' không tồn tại hoặc đã bị xóa trước đó.", cleanMaSP));
+                throw new Exception("Mã sản phẩm không được để trống!");
             }
 
-            _sanPhamDAL.Delete(cleanMaSP);
-        }
-
-        /// <summary>
-        /// Hàm kiểm tra toàn bộ quy tắc nghiệp vụ theo yêu cầu Câu 4c:
-        /// - Mã và tên sản phẩm không trống;
-        /// - Chọn loại sản phẩm;
-        /// - Ngày nhập không lớn hơn ngày hiện tại;
-        /// - Số lượng là số nguyên lớn hơn 0;
-        /// - Đơn giá là số lớn hơn 0.
-        /// </summary>
-        private void ValidateSanPham(SanPham sanPham)
-        {
-            if (sanPham == null)
+            if (sp.MaSP.Trim().Length > 20)
             {
-                throw new ArgumentNullException("sanPham", "Dữ liệu sản phẩm không được rỗng (null).");
+                throw new Exception("Mã sản phẩm không quá 20 ký tự!");
             }
 
-            // Mã sản phẩm không trống
-            if (string.IsNullOrWhiteSpace(sanPham.MaSP))
+            if (string.IsNullOrWhiteSpace(sp.TenSP))
             {
-                throw new ArgumentException("Mã sản phẩm không được để trống.");
+                throw new Exception("Tên sản phẩm không được để trống!");
             }
 
-            if (sanPham.MaSP.Trim().Length > 20)
+            if (sp.TenSP.Trim().Length > 150)
             {
-                throw new ArgumentException("Mã sản phẩm không được vượt quá 20 ký tự.");
+                throw new Exception("Tên sản phẩm không quá 150 ký tự!");
             }
 
-            // Tên sản phẩm không trống
-            if (string.IsNullOrWhiteSpace(sanPham.TenSP))
+            if (string.IsNullOrWhiteSpace(sp.MaLoai))
             {
-                throw new ArgumentException("Tên sản phẩm không được để trống.");
+                throw new Exception("Vui lòng chọn loại sản phẩm!");
             }
 
-            if (sanPham.TenSP.Trim().Length > 150)
+            if (sp.NgayNhap.Date > DateTime.Today)
             {
-                throw new ArgumentException("Tên sản phẩm không được vượt quá 150 ký tự.");
+                throw new Exception("Ngày nhập không được lớn hơn ngày hiện tại!");
             }
 
-            // Bắt buộc chọn loại sản phẩm
-            if (string.IsNullOrWhiteSpace(sanPham.MaLoai))
+            if (sp.SoLuong <= 0)
             {
-                throw new ArgumentException("Vui lòng chọn loại sản phẩm.");
+                throw new Exception("Số lượng phải là số nguyên lớn hơn 0!");
             }
 
-            // Ngày nhập không lớn hơn ngày hiện tại
-            if (sanPham.NgayNhap.Date > DateTime.Today)
+            if (sp.DonGia <= 0)
             {
-                throw new ArgumentException("Ngày nhập không được lớn hơn ngày hiện tại.");
-            }
-
-            // Số lượng là số nguyên lớn hơn 0
-            if (sanPham.SoLuong <= 0)
-            {
-                throw new ArgumentException("Số lượng sản phẩm phải là số nguyên lớn hơn 0.");
-            }
-
-            // Đơn giá là số lớn hơn 0
-            if (sanPham.DonGia <= 0)
-            {
-                throw new ArgumentException("Đơn giá sản phẩm phải là số lớn hơn 0.");
+                throw new Exception("Đơn giá phải lớn hơn 0!");
             }
         }
     }

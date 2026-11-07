@@ -7,16 +7,13 @@ namespace QuanLySanPham.DAL.Migrations
     {
         public Configuration()
         {
-            // Bật tự động Migration để EF tự động đồng bộ CSDL với Entity khi chạy
             AutomaticMigrationsEnabled = true;
             AutomaticMigrationDataLossAllowed = true;
-            ContextKey = "QuanLySanPham.DAL.QuanLySanPhamDbContext";
         }
 
-        protected override void Seed(QuanLySanPhamDbContext context)
+        protected override void Seed(QuanLySanPhamDbContext db)
         {
-            // Nạp dữ liệu mẫu tự động vào CSDL
-            QuanLySanPhamDatabaseInitializer.SeedData(context);
+            QuanLySanPhamDatabaseInitializer.SeedData(db);
         }
     }
 }

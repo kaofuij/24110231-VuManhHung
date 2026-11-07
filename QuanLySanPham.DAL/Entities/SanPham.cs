@@ -26,7 +26,7 @@ namespace QuanLySanPham.DAL.Entities
         [StringLength(10)]
         public string MaLoai { get; set; }
 
-        // Navigation property: Mỗi sản phẩm thuộc về một loại sản phẩm
+        // khoa ngoai toi LoaiSanPham
         [ForeignKey("MaLoai")]
         public virtual LoaiSanPham LoaiSanPham { get; set; }
     }

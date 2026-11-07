@@ -20,7 +20,7 @@ namespace QuanLySanPham.DAL.Entities
         [StringLength(100)]
         public string TenLoai { get; set; }
 
-        // Navigation property: Một loại sản phẩm có nhiều sản phẩm (Quan hệ 1 - N)
+        // 1 loai co nhieu san pham
         public virtual ICollection<SanPham> SanPhams { get; set; }
     }
 }

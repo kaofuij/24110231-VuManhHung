@@ -6,19 +6,11 @@ namespace QuanLySanPham.BUS
 {
     public class LoaiSanPhamBUS
     {
-        private readonly LoaiSanPhamDAL _loaiSanPhamDAL = new LoaiSanPhamDAL();
+        private LoaiSanPhamDAL dal = new LoaiSanPhamDAL();
 
-        public List<LoaiSanPham> GetAllLoaiSanPham()
+        public List<LoaiSanPham> GetAll()
         {
-            return _loaiSanPhamDAL.GetAll();
-        }
-
-        public LoaiSanPham GetLoaiSanPhamById(string maLoai)
-        {
-            if (string.IsNullOrWhiteSpace(maLoai))
-                return null;
-
-            return _loaiSanPhamDAL.GetById(maLoai.Trim());
+            return dal.GetAll();
         }
     }
 }

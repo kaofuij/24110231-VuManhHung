@@ -9,10 +9,8 @@ namespace QuanLySanPham.DAL
 {
     public class QuanLySanPhamDbContext : DbContext
     {
-        // Đọc chuỗi kết nối "QuanLySanPhamConnection" từ file App.config
         public QuanLySanPhamDbContext() : base("name=QuanLySanPhamConnection")
         {
-            // Tự động Migration cập nhật CSDL và nạp dữ liệu mẫu
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<QuanLySanPhamDbContext, Configuration>());
         }
 
@@ -23,12 +21,12 @@ namespace QuanLySanPham.DAL
         {
             base.OnModelCreating(modelBuilder);
 
-            // Cấu hình độ chính xác decimal(18,2) cho trường DonGia
+            // set kieu decimal 18,2 cho don gia
             modelBuilder.Entity<SanPham>()
                 .Property(s => s.DonGia)
                 .HasPrecision(18, 2);
 
-            // Cấu hình mối quan hệ 1 - N: một LoaiSanPham có nhiều SanPham
+            // quan he 1-n: 1 loai co nhieu san pham
             modelBuilder.Entity<LoaiSanPham>()
                 .HasMany(l => l.SanPhams)
                 .WithRequired(s => s.LoaiSanPham)
@@ -37,88 +35,28 @@ namespace QuanLySanPham.DAL
         }
     }
 
-    /// <summary>
-    /// Class hỗ trợ nạp sẵn dữ liệu mẫu đúng đề bài
-    /// </summary>
     public static class QuanLySanPhamDatabaseInitializer
     {
-        public static void SeedData(QuanLySanPhamDbContext context)
+        // them du lieu mau neu csdl chua co
+        public static void SeedData(QuanLySanPhamDbContext db)
         {
-            // 1. Khởi tạo danh mục Loại Sản Phẩm (theo dữ liệu đề bài)
-            var defaultLoais = new List<LoaiSanPham>
+            if (!db.LoaiSanPhams.Any())
             {
-                new LoaiSanPham { MaLoai = "MT", TenLoai = "Máy tính" },
-                new LoaiSanPham { MaLoai = "PK", TenLoai = "Phụ kiện" },
-                new LoaiSanPham { MaLoai = "MH", TenLoai = "Màn hình" }
-            };
-
-            foreach (var loai in defaultLoais)
-            {
-                if (!context.LoaiSanPhams.Any(l => l.MaLoai == loai.MaLoai))
-                {
-                    context.LoaiSanPhams.Add(loai);
-                }
+                db.LoaiSanPhams.Add(new LoaiSanPham { MaLoai = "MT", TenLoai = "Máy tính" });
+                db.LoaiSanPhams.Add(new LoaiSanPham { MaLoai = "PK", TenLoai = "Phụ kiện" });
+                db.LoaiSanPhams.Add(new LoaiSanPham { MaLoai = "MH", TenLoai = "Màn hình" });
+                db.SaveChanges();
             }
-            context.SaveChanges();
 
-            // 2. Khởi tạo 5 Sản Phẩm mẫu đúng như bảng giao diện trong đề bài
-            var defaultSanPhams = new List<SanPham>
+            if (!db.SanPhams.Any())
             {
-                new SanPham
-                {
-                    MaSP = "SP001",
-                    TenSP = "Laptop Dell Inspiron 15",
-                    NgayNhap = new DateTime(2026, 7, 1),
-                    SoLuong = 10,
-                    DonGia = 15500000m,
-                    MaLoai = "MT"
-                },
-                new SanPham
-                {
-                    MaSP = "SP002",
-                    TenSP = "Chuột không dây Logitech M331",
-                    NgayNhap = new DateTime(2026, 6, 15),
-                    SoLuong = 25,
-                    DonGia = 450000m,
-                    MaLoai = "PK"
-                },
-                new SanPham
-                {
-                    MaSP = "SP003",
-                    TenSP = "Bàn phím cơ Razer BlackWidow",
-                    NgayNhap = new DateTime(2026, 6, 20),
-                    SoLuong = 15,
-                    DonGia = 1900000m,
-                    MaLoai = "PK"
-                },
-                new SanPham
-                {
-                    MaSP = "SP004",
-                    TenSP = "Màn hình LG 24MP400 24\"",
-                    NgayNhap = new DateTime(2026, 7, 5),
-                    SoLuong = 12,
-                    DonGia = 2650000m,
-                    MaLoai = "MH"
-                },
-                new SanPham
-                {
-                    MaSP = "SP005",
-                    TenSP = "Tai nghe Sony WH-CH510",
-                    NgayNhap = new DateTime(2026, 7, 10),
-                    SoLuong = 20,
-                    DonGia = 1150000m,
-                    MaLoai = "PK"
-                }
-            };
-
-            foreach (var sp in defaultSanPhams)
-            {
-                if (!context.SanPhams.Any(s => s.MaSP == sp.MaSP))
-                {
-                    context.SanPhams.Add(sp);
-                }
+                db.SanPhams.Add(new SanPham { MaSP = "SP001", TenSP = "Laptop Dell Inspiron 15", NgayNhap = new DateTime(2026, 7, 1), SoLuong = 10, DonGia = 15500000m, MaLoai = "MT" });
+                db.SanPhams.Add(new SanPham { MaSP = "SP002", TenSP = "Chuột không dây Logitech M331", NgayNhap = new DateTime(2026, 6, 15), SoLuong = 25, DonGia = 450000m, MaLoai = "PK" });
+                db.SanPhams.Add(new SanPham { MaSP = "SP003", TenSP = "Bàn phím cơ Razer BlackWidow", NgayNhap = new DateTime(2026, 6, 20), SoLuong = 15, DonGia = 1900000m, MaLoai = "PK" });
+                db.SanPhams.Add(new SanPham { MaSP = "SP004", TenSP = "Màn hình LG 24MP400 24\"", NgayNhap = new DateTime(2026, 7, 5), SoLuong = 12, DonGia = 2650000m, MaLoai = "MH" });
+                db.SanPhams.Add(new SanPham { MaSP = "SP005", TenSP = "Tai nghe Sony WH-CH510", NgayNhap = new DateTime(2026, 7, 10), SoLuong = 20, DonGia = 1150000m, MaLoai = "PK" });
+                db.SaveChanges();
             }
-            context.SaveChanges();
         }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
@@ -10,78 +9,65 @@ namespace QuanLySanPham.DAL
     {
         public List<SanPham> GetAll()
         {
-            using (var context = new QuanLySanPhamDbContext())
+            using (var db = new QuanLySanPhamDbContext())
             {
-                // Đảm bảo dữ liệu mẫu đã được nạp nếu cơ sở dữ liệu mới khởi tạo
-                QuanLySanPhamDatabaseInitializer.SeedData(context);
-
-                // Dùng Include để nạp thuộc tính điều hướng LoaiSanPham (Eager Loading)
-                return context.SanPhams
-                    .Include(s => s.LoaiSanPham)
-                    .OrderBy(s => s.MaSP)
-                    .ToList();
+                QuanLySanPhamDatabaseInitializer.SeedData(db);
+                return db.SanPhams.Include(s => s.LoaiSanPham).ToList();
             }
         }
 
-        public SanPham GetById(string maSP)
+        public SanPham GetById(string ma)
         {
-            using (var context = new QuanLySanPhamDbContext())
+            using (var db = new QuanLySanPhamDbContext())
             {
-                return context.SanPhams
-                    .Include(s => s.LoaiSanPham)
-                    .FirstOrDefault(s => s.MaSP == maSP);
+                return db.SanPhams.Include(s => s.LoaiSanPham).FirstOrDefault(s => s.MaSP == ma);
             }
         }
 
-        public bool CheckExists(string maSP)
+        public bool CheckExists(string ma)
         {
-            using (var context = new QuanLySanPhamDbContext())
+            using (var db = new QuanLySanPhamDbContext())
             {
-                return context.SanPhams.Any(s => s.MaSP.ToLower() == maSP.ToLower());
+                return db.SanPhams.Any(s => s.MaSP.ToLower() == ma.ToLower());
             }
         }
 
-        public void Add(SanPham sanPham)
+        public void Add(SanPham sp)
         {
-            using (var context = new QuanLySanPhamDbContext())
+            using (var db = new QuanLySanPhamDbContext())
             {
-                context.SanPhams.Add(sanPham);
-                context.SaveChanges();
+                db.SanPhams.Add(sp);
+                db.SaveChanges();
             }
         }
 
-        public void Update(SanPham sanPham)
+        public void Update(SanPham sp)
         {
-            using (var context = new QuanLySanPhamDbContext())
+            using (var db = new QuanLySanPhamDbContext())
             {
-                var existing = context.SanPhams.Find(sanPham.MaSP);
-                if (existing == null)
+                var item = db.SanPhams.Find(sp.MaSP);
+                if (item != null)
                 {
-                    throw new Exception(string.Format("Không tìm thấy sản phẩm có mã '{0}' để cập nhật.", sanPham.MaSP));
+                    item.TenSP = sp.TenSP;
+                    item.NgayNhap = sp.NgayNhap;
+                    item.SoLuong = sp.SoLuong;
+                    item.DonGia = sp.DonGia;
+                    item.MaLoai = sp.MaLoai;
+                    db.SaveChanges();
                 }
-
-                existing.TenSP = sanPham.TenSP;
-                existing.NgayNhap = sanPham.NgayNhap;
-                existing.SoLuong = sanPham.SoLuong;
-                existing.DonGia = sanPham.DonGia;
-                existing.MaLoai = sanPham.MaLoai;
-
-                context.SaveChanges();
             }
         }
 
-        public void Delete(string maSP)
+        public void Delete(string ma)
         {
-            using (var context = new QuanLySanPhamDbContext())
+            using (var db = new QuanLySanPhamDbContext())
             {
-                var existing = context.SanPhams.Find(maSP);
-                if (existing == null)
+                var item = db.SanPhams.Find(ma);
+                if (item != null)
                 {
-                    throw new Exception(string.Format("Không tìm thấy sản phẩm có mã '{0}' để xóa.", maSP));
+                    db.SanPhams.Remove(item);
+                    db.SaveChanges();
                 }
-
-                context.SanPhams.Remove(existing);
-                context.SaveChanges();
             }
         }
     }
