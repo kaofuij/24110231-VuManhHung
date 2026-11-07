@@ -45,7 +45,6 @@
   <ItemGroup>
     <Compile Include="Entities\LoaiSanPham.cs" />
     <Compile Include="Entities\SanPham.cs" />
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="QuanLySanPhamDbContext.cs" />
     <Compile Include="LoaiSanPhamDAL.cs" />
     <Compile Include="SanPhamDAL.cs" />

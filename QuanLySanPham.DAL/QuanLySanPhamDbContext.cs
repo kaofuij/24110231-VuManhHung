@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using QuanLySanPham.DAL.Entities;
-using QuanLySanPham.DAL.Migrations;
 
 namespace QuanLySanPham.DAL
 {
@@ -11,7 +10,7 @@ namespace QuanLySanPham.DAL
     {
         public QuanLySanPhamDbContext() : base("name=QuanLySanPhamConnection")
         {
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<QuanLySanPhamDbContext, Configuration>());
+            Database.SetInitializer(new QuanLySanPhamDatabaseInitializer());
         }
 
         public virtual DbSet<LoaiSanPham> LoaiSanPhams { get; set; }
@@ -35,27 +34,40 @@ namespace QuanLySanPham.DAL
         }
     }
 
-    public static class QuanLySanPhamDatabaseInitializer
+    public class QuanLySanPhamDatabaseInitializer : CreateDatabaseIfNotExists<QuanLySanPhamDbContext>
     {
+        protected override void Seed(QuanLySanPhamDbContext context)
+        {
+            SeedData(context);
+            base.Seed(context);
+        }
+
         // them du lieu mau neu csdl chua co
         public static void SeedData(QuanLySanPhamDbContext db)
         {
-            if (!db.LoaiSanPhams.Any())
+            try
             {
-                db.LoaiSanPhams.Add(new LoaiSanPham { MaLoai = "MT", TenLoai = "Máy tính" });
-                db.LoaiSanPhams.Add(new LoaiSanPham { MaLoai = "PK", TenLoai = "Phụ kiện" });
-                db.LoaiSanPhams.Add(new LoaiSanPham { MaLoai = "MH", TenLoai = "Màn hình" });
-                db.SaveChanges();
-            }
+                if (!db.LoaiSanPhams.Any())
+                {
+                    db.LoaiSanPhams.Add(new LoaiSanPham { MaLoai = "MT", TenLoai = "Máy tính" });
+                    db.LoaiSanPhams.Add(new LoaiSanPham { MaLoai = "PK", TenLoai = "Phụ kiện" });
+                    db.LoaiSanPhams.Add(new LoaiSanPham { MaLoai = "MH", TenLoai = "Màn hình" });
+                    db.SaveChanges();
+                }
 
-            if (!db.SanPhams.Any())
+                if (!db.SanPhams.Any())
+                {
+                    db.SanPhams.Add(new SanPham { MaSP = "SP001", TenSP = "Laptop Dell Inspiron 15", NgayNhap = new DateTime(2026, 7, 1), SoLuong = 10, DonGia = 15500000m, MaLoai = "MT" });
+                    db.SanPhams.Add(new SanPham { MaSP = "SP002", TenSP = "Chuột không dây Logitech M331", NgayNhap = new DateTime(2026, 6, 15), SoLuong = 25, DonGia = 450000m, MaLoai = "PK" });
+                    db.SanPhams.Add(new SanPham { MaSP = "SP003", TenSP = "Bàn phím cơ Razer BlackWidow", NgayNhap = new DateTime(2026, 6, 20), SoLuong = 15, DonGia = 1900000m, MaLoai = "PK" });
+                    db.SanPhams.Add(new SanPham { MaSP = "SP004", TenSP = "Màn hình LG 24MP400 24\"", NgayNhap = new DateTime(2026, 7, 5), SoLuong = 12, DonGia = 2650000m, MaLoai = "MH" });
+                    db.SanPhams.Add(new SanPham { MaSP = "SP005", TenSP = "Tai nghe Sony WH-CH510", NgayNhap = new DateTime(2026, 7, 10), SoLuong = 20, DonGia = 1150000m, MaLoai = "PK" });
+                    db.SaveChanges();
+                }
+            }
+            catch
             {
-                db.SanPhams.Add(new SanPham { MaSP = "SP001", TenSP = "Laptop Dell Inspiron 15", NgayNhap = new DateTime(2026, 7, 1), SoLuong = 10, DonGia = 15500000m, MaLoai = "MT" });
-                db.SanPhams.Add(new SanPham { MaSP = "SP002", TenSP = "Chuột không dây Logitech M331", NgayNhap = new DateTime(2026, 6, 15), SoLuong = 25, DonGia = 450000m, MaLoai = "PK" });
-                db.SanPhams.Add(new SanPham { MaSP = "SP003", TenSP = "Bàn phím cơ Razer BlackWidow", NgayNhap = new DateTime(2026, 6, 20), SoLuong = 15, DonGia = 1900000m, MaLoai = "PK" });
-                db.SanPhams.Add(new SanPham { MaSP = "SP004", TenSP = "Màn hình LG 24MP400 24\"", NgayNhap = new DateTime(2026, 7, 5), SoLuong = 12, DonGia = 2650000m, MaLoai = "MH" });
-                db.SanPhams.Add(new SanPham { MaSP = "SP005", TenSP = "Tai nghe Sony WH-CH510", NgayNhap = new DateTime(2026, 7, 10), SoLuong = 20, DonGia = 1150000m, MaLoai = "PK" });
-                db.SaveChanges();
+                // bo qua neu du lieu da duoc them
             }
         }
     }
